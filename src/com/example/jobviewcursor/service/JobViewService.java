@@ -13,11 +13,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.jobviewcursor.database.JobDataBaseAdapter;
+import com.example.jobviewcursor.database.BaseProvider;
+import com.example.jobviewcursor.database.JobDataBase;
 import com.example.jobviewcursor.model.Job;
 
 import android.app.IntentService;
+import android.content.ContentProviderOperation;
 import android.content.Intent;
+import android.content.OperationApplicationException;
+import android.os.RemoteException;
 import android.util.Log;
 
 public class JobViewService extends IntentService{
@@ -57,8 +61,7 @@ public class JobViewService extends IntentService{
 		inStream = httpConnectionStream(url);
 		JSONString = getJsonString(inStream);
 		jobs = jsonParser(JSONString);
-		new JobDataBaseAdapter(this).insertData(jobs);
-		Log.d("MyDebug","Jobs: "+jobs);
+		putAllData(jobs);
 		final Intent in = new Intent("GET_CURSOR_FROM_DB");
 		in.putExtra("Status", 1);
 		sendBroadcast(in);
@@ -114,6 +117,25 @@ public class JobViewService extends IntentService{
 		final String date = jObject.getString("ExpiresDate");
 		final String description = jObject.getString("Description");
 		return new Job(title,date,description);
+	}
+	
+	private void putAllData(ArrayList<Job> jobs){
+		ArrayList<ContentProviderOperation> operation = new ArrayList<ContentProviderOperation>();
+		try{
+			for(Job job : jobs){
+				operation.add(ContentProviderOperation.newInsert(BaseProvider.JOBS_URI)
+						.withValue(JobDataBase.TITLE,job.getTitle())
+						.withValue(JobDataBase.DATE,job.getDate())
+						.withValue(JobDataBase.DESCRIPTION,job.getDescription())
+						.build());
+			}
+			getContentResolver().applyBatch(BaseProvider.AUTHORITY, operation);
+		}catch(RemoteException exc){
+			
+		}catch(OperationApplicationException exc){
+			
+		}
+		
 	}
 
 }

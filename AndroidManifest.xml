@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <service android:label="JobViewService" android:name=".service.JobViewService"></service>
+        <provider android:label="data_provider" android:name=".database.BaseProvider" android:authorities="com.example.jobviewcursor.provider.JobBase"></provider>
     </application>
 
 </manifest>

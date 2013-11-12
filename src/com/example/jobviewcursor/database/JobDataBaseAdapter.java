@@ -10,17 +10,14 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+@Deprecated
 public class JobDataBaseAdapter {
-	
-	private static final String DATABASE_NAME = "JobBase";
-	private static final String TABLE_NAME = "Jobs";
-	private static final int VERSION = 1;
 	
 	private JobDataBase jobDBHelper;
 	private SQLiteDatabase jobBase;
 	
 	public JobDataBaseAdapter(Context context){
-		jobDBHelper = new JobDataBase(context, DATABASE_NAME, null, VERSION);
+		jobDBHelper = new JobDataBase(context);
 	}
 	public void openDB() throws SQLException{
 		jobBase = jobDBHelper.getWritableDatabase();
@@ -43,14 +40,14 @@ public class JobDataBaseAdapter {
 	}
 	public Cursor getAllJobs(){
 		Cursor cursor = null;
-		cursor = jobBase.rawQuery("SELECT * from "+TABLE_NAME,null);
+		cursor = jobBase.rawQuery("SELECT * from "+JobDataBase.TABLE_NAME,null);
 		if(cursor != null)
 			cursor.moveToFirst();
 		return cursor;
 	}
 	public void deleteItems(){
 		openDB();
-		jobBase.execSQL("delete from "+TABLE_NAME);
+		jobBase.execSQL("delete from "+JobDataBase.TABLE_NAME);
 		closeDB();
 	}
 }

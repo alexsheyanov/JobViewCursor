@@ -2,18 +2,17 @@ package com.example.jobviewcursor.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class JobDataBase extends SQLiteOpenHelper{
 	
-	private static final String DATABASE_NAME = "JobBase";
-	private static final String TABLE_NAME = "Jobs";
-	private static final int VERSION = 1;
-	private static final String ROW_ID = "_id";
-	private static final String TITLE = "Title";
-	private static final String DATE = "Date";
-	private static final String DESCRIPTION = "Description";
+	public static final String DATABASE_NAME = "JobBase";
+	public static final String TABLE_NAME = "Jobs";
+	public static final int VERSION = 1;
+	public static final String ROW_ID = "_id";
+	public static final String TITLE = "Title";
+	public static final String DATE = "Date";
+	public static final String DESCRIPTION = "Description";
 	
 	private static final String CREATE_DB = 
 			"CREATE TABLE " + TABLE_NAME + "("+
@@ -22,8 +21,7 @@ public class JobDataBase extends SQLiteOpenHelper{
 			DATE + "," +
 			DESCRIPTION +");";
 
-	public JobDataBase(Context context, String name, CursorFactory factory,
-			int version) {
+	public JobDataBase(Context context) {
 		super(context, DATABASE_NAME, null, VERSION);
 	}
 
