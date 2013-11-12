@@ -7,8 +7,9 @@
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="18" />
-    <uses-permission android:name="android.permission.INTERNET" />"
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -25,6 +26,11 @@
         </activity>
         <service android:label="JobViewService" android:name=".service.JobViewService"></service>
         <provider android:label="data_provider" android:name=".database.BaseProvider" android:authorities="com.example.jobviewcursor.provider.JobBase"></provider>
+        <receiver android:name=".receiver.GlobalReceiver">
+            <intent-filter>
+                <action android:name="com.example.jobviewcursor.receiver"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

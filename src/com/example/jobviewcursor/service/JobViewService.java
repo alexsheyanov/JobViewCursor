@@ -19,8 +19,11 @@ import com.example.jobviewcursor.model.Job;
 
 import android.app.IntentService;
 import android.content.ContentProviderOperation;
+import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -41,7 +44,8 @@ public class JobViewService extends IntentService{
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		urlConnection.disconnect();
+		if(urlConnection != null)
+			urlConnection.disconnect();
 		if(bufReader !=null)
 			try {
 				bufReader.close();
@@ -58,13 +62,19 @@ public class JobViewService extends IntentService{
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		inStream = httpConnectionStream(url);
-		JSONString = getJsonString(inStream);
-		jobs = jsonParser(JSONString);
-		putAllData(jobs);
-		final Intent in = new Intent("GET_CURSOR_FROM_DB");
-		in.putExtra("Status", 1);
-		sendBroadcast(in);
+		if(httpConnectionStatus(this)){
+			inStream = httpConnectionStream(url);
+			JSONString = getJsonString(inStream);
+			jobs = jsonParser(JSONString);
+			putAllData(jobs);
+			final Intent in = new Intent("com.example.jobviewcursor.receiver");
+			in.putExtra("Status", 1);
+			sendBroadcast(in);
+		}else{
+			final Intent in = new Intent("com.example.jobviewcursor.receiver");
+			in.putExtra("Status", 2);
+			sendBroadcast(in);
+		}
 	}
 	
 	private InputStream httpConnectionStream(String url){
@@ -131,11 +141,23 @@ public class JobViewService extends IntentService{
 			}
 			getContentResolver().applyBatch(BaseProvider.AUTHORITY, operation);
 		}catch(RemoteException exc){
-			
+			exc.printStackTrace();
 		}catch(OperationApplicationException exc){
-			
+			exc.printStackTrace();
 		}
 		
+	}
+	private Boolean httpConnectionStatus(Context context){
+		final ConnectivityManager connectManager = 
+				(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final NetworkInfo netInfo = connectManager.getActiveNetworkInfo();
+			if(netInfo == null || !netInfo.isConnected()){
+				return false;
+			}
+			if(netInfo.isRoaming()){
+				return false;
+			}
+		return true;
 	}
 
 }
